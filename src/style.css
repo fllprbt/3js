@@ -1,0 +1,23 @@
+*
+{
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body
+{
+
+    overflow: hidden;
+    background: rgb(0,255,241);
+    background: linear-gradient(180deg, rgba(0,255,241,1) 0%, rgba(7,157,157,0.9906556372549019) 51%, rgba(15,92,143,1) 75%, rgba(5,25,87,1) 100%);
+}
+
+.webgl
+{
+    position: fixed;
+    top: 0;
+    left: 0;
+    outline: none;
+    background: inherit;
+}
