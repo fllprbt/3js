@@ -15,12 +15,21 @@ const Opts = {
   Count: 500,
   DogeGrowthMultiplier: 1.05,
   DonutShrinkMultiplier: 0.99,
+  Sounds: false,
 };
 
 const sizes = {
   width: window.innerWidth,
   height: window.innerHeight,
 };
+
+const sounds = [
+  new Audio("/audio/eating.mp3"),
+  new Audio("/audio/woof.mp3"),
+  new Audio("/audio/woof2.mp3"),
+  new Audio("/audio/woof3.mp3"),
+  new Audio("/audio/woof4.mp3"),
+];
 
 window.addEventListener("resize", () => {
   // Update sizes
@@ -110,6 +119,10 @@ const tick = () => {
           sphereBox.intersectsBox(donutBoundingBox) &&
           !sphereCollisionDisabled[i]
         ) {
+          if (Opts.Sounds) {
+            sounds[Math.floor(Math.random() * 5)].play();
+          }
+
           donut.scale.set(
             donut.scale.x * Opts.DonutShrinkMultiplier,
             donut.scale.y * Opts.DonutShrinkMultiplier,
@@ -158,6 +171,7 @@ tick();
 /**
  * Debug Controls
  */
+gui.add(Opts, "Sounds");
 const sphereFolder = gui.addFolder("Doge");
 const donutFolder = gui.addFolder("Donut");
 const delayFolder = gui.addFolder("Delays");
