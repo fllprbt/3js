@@ -5,7 +5,8 @@ import { generateSpheres } from "./utils/generateSpheres";
 import { generateDonut } from "./utils/generateDonut";
 
 const gui = new GUI();
-const sphereFolder = gui.addFolder("Spheres");
+const sphereFolder = gui.addFolder("Doge");
+const donutFolder = gui.addFolder("Donut");
 const delayFolder = gui.addFolder("Delays");
 const cameraFolder = gui.addFolder("Camera");
 
@@ -17,10 +18,14 @@ const Opts = {
   StartupDelay: 1,
   CollisionDelay: 3,
   Count: 500,
+  DogeGrowthMultiplier: 1.05,
+  DonutShrinkMultiplier: 0.99,
 };
 
 sphereFolder.add(Opts, "Speed").min(0.05).max(2);
 sphereFolder.add(Opts, "Length").min(1).max(100);
+sphereFolder.add(Opts, "DogeGrowthMultiplier").min(1.01).max(3);
+donutFolder.add(Opts, "DonutShrinkMultiplier").min(0.1).max(0.99);
 delayFolder.add(Opts, "StartupDelay").min(0).max(5);
 delayFolder.add(Opts, "CollisionDelay").min(0).max(5);
 
@@ -51,6 +56,8 @@ const textureLoader = new THREE.TextureLoader();
 const dogeTexture = textureLoader.load("/textures/doge.png");
 
 let { spheres, offsets } = generateSpheres(Opts.Count, dogeTexture);
+const sphereCollisionDisabled = {};
+
 let donut = generateDonut();
 
 const reloadScene = (count) => {
@@ -122,21 +129,26 @@ const tick = () => {
 
         if (
           sphereBox.intersectsBox(donutBoundingBox) &&
-          sphere.material.color.r === 1 // Not growing
+          !sphereCollisionDisabled[i]
         ) {
           donut.scale.set(
-            donut.scale.x * 0.99,
-            donut.scale.y * 0.99,
-            donut.scale.z * 0.99
+            donut.scale.x * Opts.DonutShrinkMultiplier,
+            donut.scale.y * Opts.DonutShrinkMultiplier,
+            donut.scale.z * Opts.DonutShrinkMultiplier
           );
 
           sphere.scale.set(
-            sphere.scale.x * 1.01,
-            sphere.scale.y * 1.01,
-            sphere.scale.z * 1.01
+            sphere.scale.x * Opts.DogeGrowthMultiplier,
+            sphere.scale.y * Opts.DogeGrowthMultiplier,
+            sphere.scale.z * Opts.DogeGrowthMultiplier
           );
+          sphereCollisionDisabled[i] = true;
           sphere.material.color.setHex(0xff0000);
-          setTimeout(() => sphere.material.color.setHex(0xffffff), 1000);
+
+          setTimeout(() => {
+            sphere.material.color.setHex(0xffffff);
+            sphereCollisionDisabled[i] = false;
+          }, 1000);
         }
       }
 
