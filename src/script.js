@@ -5,11 +5,6 @@ import { generateSpheres } from "./utils/generateSpheres";
 import { generateDonut } from "./utils/generateDonut";
 
 const gui = new GUI();
-const sphereFolder = gui.addFolder("Doge");
-const donutFolder = gui.addFolder("Donut");
-const delayFolder = gui.addFolder("Delays");
-const cameraFolder = gui.addFolder("Camera");
-
 const clock = new THREE.Clock();
 
 const Opts = {
@@ -21,13 +16,6 @@ const Opts = {
   DogeGrowthMultiplier: 1.05,
   DonutShrinkMultiplier: 0.99,
 };
-
-sphereFolder.add(Opts, "Speed").min(0.05).max(2);
-sphereFolder.add(Opts, "Length").min(1).max(100);
-sphereFolder.add(Opts, "DogeGrowthMultiplier").min(1.01).max(3);
-donutFolder.add(Opts, "DonutShrinkMultiplier").min(0.1).max(0.99);
-delayFolder.add(Opts, "StartupDelay").min(0).max(5);
-delayFolder.add(Opts, "CollisionDelay").min(0).max(5);
 
 const sizes = {
   width: window.innerWidth,
@@ -70,12 +58,6 @@ const reloadScene = (count) => {
   clock.start();
 };
 
-sphereFolder
-  .add(Opts, "Count")
-  .min(50)
-  .max(10000)
-  .onChange((value) => reloadScene(value));
-
 document.querySelector("button.reset").addEventListener("click", () => {
   reloadScene(Opts.Count); // If Control has been used it uses its last value
 });
@@ -95,9 +77,6 @@ camera.position.x = 1;
 camera.position.y = 0;
 camera.position.z = 3;
 scene.add(camera);
-
-cameraFolder.add(camera, "near").min(0.0001).max(1);
-cameraFolder.add(camera, "far").min(1).max(10000);
 
 // Controls
 const controls = new OrbitControls(camera, canvas);
@@ -175,3 +154,47 @@ const tick = () => {
 };
 
 tick();
+
+/**
+ * Debug Controls
+ */
+const sphereFolder = gui.addFolder("Doge");
+const donutFolder = gui.addFolder("Donut");
+const delayFolder = gui.addFolder("Delays");
+const cameraFolder = gui.addFolder("Camera");
+
+sphereFolder.add(Opts, "Speed").min(0.05).max(2);
+sphereFolder.add(Opts, "Length").min(1).max(100);
+sphereFolder.add(Opts, "DogeGrowthMultiplier").min(1.01).max(3);
+sphereFolder
+  .add(Opts, "Count")
+  .min(50)
+  .max(10000)
+  .onChange((value) => {
+    Opts.Count = value;
+  })
+  .onFinishChange(() => reloadScene(Opts.Count));
+
+donutFolder.add(Opts, "DonutShrinkMultiplier").min(0.1).max(0.99);
+
+delayFolder
+  .add(Opts, "StartupDelay")
+  .min(0)
+  .max(5)
+  .onFinishChange(() => reloadScene(Opts.Count));
+delayFolder
+  .add(Opts, "CollisionDelay")
+  .min(0)
+  .max(5)
+  .onFinishChange(() => reloadScene(Opts.Count));
+
+cameraFolder
+  .add(camera, "near")
+  .min(0.0001)
+  .max(1)
+  .onFinishChange(() => camera.updateProjectionMatrix());
+cameraFolder
+  .add(camera, "far")
+  .min(1)
+  .max(10000)
+  .onFinishChange(() => camera.updateProjectionMatrix());
